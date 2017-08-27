@@ -51,4 +51,4 @@ $15
 15.00
 15
 ```
-Any other format other than the above is not an acceptable format.
+Any format other than the above is not an acceptable format.
