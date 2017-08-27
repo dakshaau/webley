@@ -8,10 +8,16 @@ def match_price_pattern(price):
     """
     This function makes sure that the pattern is in the following format:
         $x.xx
+        x.xx
+        x
+
     Examples:
         $15.05
         $1.00
         $12341.12
+        15.05
+        3.00
+        34
 
     >>> match_price_pattern('$.90')
     False
@@ -33,47 +39,101 @@ def match_price_pattern(price):
     >>> match_price_pattern('$0...012')
     False
     >>> match_price_pattern('1.22')
-    False
+    True
     >>> match_price_pattern('$0*12')
     False
+    >>> match_price_pattern('0.003')
+    False
+    >>> match_price_pattern('15')
+    True
+    >>> match_price_pattern('15.')
+    False
+    >>> match_price_pattern('15.0')
+    False
     """
-    pattern = re.compile('\$[0-9]+\.[0-9]{2}')
+    pattern = re.compile('(\$[0-9]+\.[0-9]{2}|[0-9]+\.[0-9]{2}|[0-9]+)')
     return True if pattern.fullmatch(price) else False
 
 
 def parse_data_file(lines):
     """
-    This function parses the list of lines in data file containing the menu
-    items and returns a dictionary with price as keys and item names as values.
+    This function parses the list of lines in data file containing the target
+    value and menu items.
 
-    >>> parse_data_file(['acb,123', 'amc,asd'])
-    {}
-    >>> {'abc':1.0,'ans':30.0}==parse_data_file(['abc,$1.00\\n','ans,$30.00\\n'])
+    Returns: Target price value (float),
+             Menu data (dict)
+
+    >>> targ, menu=parse_data_file(['acb,123', 'amc,asd'])
+    Invalid format price format, asd, for data file ...
+    <BLANKLINE>
+    Accepted formats: $xx.xx, xx.xx, xx
+    Examples: $15.00, $1.00, $0.03, 1, 0.03, 15.05
+    <BLANKLINE>
+    Exiting ...
+    >>> targ == 0.
     True
-    >>> {'abc':1.0,'anc':30.01}==parse_data_file(['abc , $1.00\\n','   anc, $30.01\\n'])
+    >>> menu == {}
+    True
+    >>> targ, menu= parse_data_file(['abc,$1.00\\n','ans,$30.00\\n'])
+    >>> targ == 1.
+    True
+    >>> {'ans':30.0} == menu
+    True
+    >>> targ, menu = parse_data_file(['abc , $1.00\\n','   anc, $30.01\\n'])
+    >>> targ == 1.
+    True
+    >>> {'anc':30.01} == menu
+    True
+    >>> targ, menu = parse_data_file(['target,15\\n','\\n','abc, 25.01\\n'])
+    >>> targ == 15.
+    True
+    >>> menu == {'abc': 25.01}
+    True
+    >>> targ, menu = parse_data_file(['target,15\\n','xcv\\n','abc, 25.01\\n'])
+    Invalid CSV file ...
+    Exiting ...
+    >>> targ == 0.
+    True
+    >>> menu == {}
     True
     """
     menu_items = {}
-    for line in lines:
+    target = 0.
+    for ind, line in enumerate(lines):
         item = None
         price = None
         try:
             line = line.strip()
-            item, price = line.split(',')
+            if 1 < line.count(','):
+                raise Exception
+            elif line and line.count(',') == 0:
+                raise Exception
+            else:
+                item, price = line.split(',')
+        except ValueError as e:
+            # Ignoring empty lines
+            pass
         except Exception as e:
-            print('Invalid format price format, {}, for data file ...'.format(
-                price
-                ))
-            print('\nAccepted format: $xxxx.xx')
-            print('Examples: $15.00, $1.00, $0.03')
-            print('\nExiting ...')
-            return {}
+            print('Invalid CSV file ...')
+            print('Exiting ...')
+            return 0., {}
         else:
             item = item.strip()
             price = price.strip()
             if match_price_pattern(price):
-                menu_items[item] = float(price[1:])
-    return menu_items
+                if ind == 0:
+                    target = float(price[1:] if '$' in price else price)
+                else:
+                    menu_items[item] = float(price[1:] if '$' in price else price)
+            else:
+                print('Invalid format price format, {}, for data file ...'.format(
+                    price
+                    ))
+                print('\nAccepted formats: $xx.xx, xx.xx, xx')
+                print('Examples: $15.00, $1.00, $0.03, 1, 0.03, 15.05')
+                print('\nExiting ...')
+                return 0., {}
+    return target, menu_items
 
 
 def breadth_first_search(target, menu):
@@ -121,17 +181,6 @@ def find_combination(target, menu):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-t',
-        '--target',
-        help='''Location of CSV file containing target price.
-        Defaults to 'target.csv'.
-        ''',
-        nargs='?',
-        const='target.csv',
-        required=True,
-        )
-
-    parser.add_argument(
         '-d',
         '--data',
         help='''Location of CSV file containing menu data.
@@ -143,26 +192,6 @@ if __name__ == '__main__':
         )
 
     args = parser.parse_args()
-    target = None
-    try:
-        target = open(args.target, 'r')
-    except FileNotFoundError as e:
-        print('Unable to find {} ...'.format(args.target))
-    except Exception as e:
-        print('Unable to open {} ...'.format(args.target))
-        print('Try with administrative priviledges.')
-
-    _, target = target.readline().split(',')
-    if match_price_pattern(target.strip()):
-        target = float(target[1:])
-    else:
-        print('Price data, {}, not in accepted format ...'.format(target))
-        print('\nAccepted format: $xxxx.xx')
-        print('Examples: $15.00, $1.00, $0.03')
-        print('\nExiting ...')
-        sys.exit()
-
-    # print(target)
     data_file = None
     try:
         data_file = open(args.data, 'r')
@@ -172,7 +201,7 @@ if __name__ == '__main__':
         print('Unable to open {} ...'.format(args.target))
         print('Try with administrative priviledges.')
 
-    menu = parse_data_file(data_file)
+    target, menu = parse_data_file(data_file)
     if not menu:
         sys.exit()
 
