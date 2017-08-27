@@ -25,8 +25,8 @@ Available options:
 Option | Description
 --- | ---
 `-h` | Help
-`-t`, `--target` | Specify CSV file with target value. Defaults to 'target.csv'
-`-d`, `--data` | Specify CSV file with menu data. Defaults to 'data.csv'
+`-t`, `--target` | Specify path to CSV file with target value. Defaults to 'target.csv'
+`-d`, `--data` | Specify path to CSV file with menu data. Defaults to 'data.csv'
 
 Here is a sample **_target.csv_** file:
 ```
