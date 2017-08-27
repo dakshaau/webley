@@ -28,12 +28,12 @@ Option | Description
 `-t`, `--target` | Specify CSV file with target value. Defaults to 'target.csv'
 `-d`, `--data` | Specify CSV file with menu data. Defaults to 'data.csv'
 
-Here is a sample target.csv file:
+Here is a sample **_target.csv_** file:
 ```
 target price,$15.05
 ```
 
-Here is a sample data.csv file:
+Here is a sample **_data.csv_** file:
 ```
 mixed fruit,$2.15
 french fries,$2.75
