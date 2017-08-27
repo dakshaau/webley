@@ -2,6 +2,7 @@ import argparse
 import re
 import sys
 import itertools
+from collections import Counter, deque
 
 
 def match_price_pattern(price):
@@ -138,33 +139,33 @@ def parse_data_file(lines):
     return target, menu_items
 
 
-def breadth_first_search(target, menu):
+def breadth_first_search(target, menu, max_level=20):
     """
     This function performs breadth first graph search on the menu items
     to find a combination of itmes whose price sums up to the target value.
 
-    >>> {'a','c','d'} == breadth_first_search(15, {'a':2,'b':4,'c':6,'d':7})
-    True
-    >>> {'c'} == breadth_first_search(6, {'a':2,'b':4,'c':6,'d':7})
-    True
-    >>> frozenset() == breadth_first_search(18, {'a':2,'b':4,'c':6,'d':7})
+    The max_level argument should be an integer which sppecifies the maximum
+    depth to be searched before declaring no sulution.
+
+    >>> {'c': 1} == breadth_first_search(6, {'a':2,'b':4,'c':6,'d':7})
     True
     """
-    visited = set()
-    queue = [(frozenset([item]), menu[item]) for item in menu]
+    visited = []
+    queue = deque([(Counter([item]), menu[item]) for item in menu])
     while queue:
-        combination, cur_sum = queue.pop(0)
-        if combination not in visited:
-            visited.add(combination)
-            if cur_sum < target:
-                for item, price in menu.items():
-                    new_combination = combination | frozenset([item])
-                    if new_combination not in visited:
-                        queue.append((new_combination, cur_sum+price))
-            if cur_sum == target:
-                return combination
-        # print(visited)
-    return frozenset()
+        combination, cur_sum = queue.popleft()
+        if sum(combination.values()) <= max_level:
+            if combination not in visited:
+                visited.append(combination)
+                if cur_sum < target:
+                    for item, price in menu.items():
+                        new_combination = combination + Counter([item])
+                        if new_combination not in visited:
+                            queue.append((new_combination, cur_sum+price))
+                if cur_sum == target:
+                    return combination
+            # print(visited)
+    return Counter()
 
 
 def find_combination(target, menu):
@@ -210,11 +211,11 @@ if __name__ == '__main__':
     print('Target price: ${:.2f}'.format(target))
     print('\nMenu:')
     for item in menu:
-        print('{}\t${:.2f}'.format(item, menu[item]))
+        print('${1:.2f}\t{0}'.format(item, menu[item]))
     print()
 
     combination = find_combination(target, menu)
     if len(combination) == 0:
         print('There is no combination of dishes that is equal to the target price')
     else:
-        [print(i) for i in combination]
+        [print('{} {}'.format(combination[item], item)) for item in combination]
