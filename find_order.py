@@ -58,7 +58,7 @@ def match_price_pattern(price):
     return True if pattern.fullmatch(price) else False
 
 
-def parse_data_file(lines, verbose):
+def parse_data_file(lines, verbose=True):
     """
     This function parses the list of lines in data file containing the target
     value and menu items.
@@ -151,6 +151,9 @@ def breadth_first_search(target, menu, max_level=15):
 
     >>> {'c': 1} == breadth_first_search(6, {'a':2,'b':4,'c':6,'d':7})
     True
+    >>> from collections import Counter
+    >>> Counter() == breadth_first_search(6.02, {'a':2,'b':4,'c':6,'d':7})
+    True
     """
     visited = []
     queue = deque([(Counter([item]), menu[item]) for item in menu])
@@ -179,14 +182,23 @@ def find_combination(target, menu, max_level):
     breadth_first_search.
 
     Returns: A Counter containing combination of menu items.
+                OR
              An empty Counter if no combination is possible.
     """
     filtered_menu = dict([(key, value) for key, value in menu.items() if value <= target])
     return breadth_first_search(target, menu, max_level=max_level)
 
 
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        print()
+        print(message)
+        print()
+        self.print_help()
+        sys.exit()
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Webley Coding Puzzle, by Daksh Gupta')
+    parser = Parser(description='Webley Coding Puzzle, by Daksh Gupta')
     parser.add_argument(
         '-d',
         '--data',
@@ -219,7 +231,10 @@ if __name__ == '__main__':
         default=15,
         )
 
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except Exception as e:
+        parser.print_help()
     verbosity = args.verbose
     max_level = args.max_level
     data_file = None
