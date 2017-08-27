@@ -4,6 +4,16 @@
 
 **Language:** Python 3.6
 
+### Download
+
+To donwload the source code, simply clone the repository in your system
+The instructions to run the code or the tests are below.
+
+You can use the following command to clone this repository:
+```shell
+git clone https://github.com/dakshaau/webley.git
+```
+
 ### Testing
 
 Doctests are included in the methods, to ensure that the code is working as expected.
@@ -12,6 +22,7 @@ They can be executed using the following command:
 ```shell
 python -m doctest -v find_order.py
 ```
+**NOTE:** The code is written in Python 3 so linux users need to use `python3` rather than `python`.
 
 ### Execution
 
@@ -19,6 +30,7 @@ To run the program use the following command on your console:
 ```shell
 python find_order.py [OPTIONS]
 ```
+**NOTE:** The code is written in Python 3 so linux users need to use `python3` rather than `python`.
 
 Available options:
 
