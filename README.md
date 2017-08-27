@@ -28,10 +28,18 @@ Option | Description
 `-t`, `--target` | Specify CSV file with target value. Defaults to 'target.csv'
 `-d`, `--data` | Specify CSV file with menu data. Defaults to 'data.csv'
 
-The target file should contain data as follows
+Here is a sample target.csv file:
 ```
-target,$15.05
+target price,$15.05
 ```
-The value `$15.05` can be anything as long as it is specified to a precision of 2 decimal places and begins with '$'.
 
-All menu items should also be specified in the same format in a separate CSV file.
+Here is a sample data.csv file:
+```
+mixed fruit,$2.15
+french fries,$2.75
+side salad,$3.35
+hot wings,$3.55
+mozzarella sticks,$4.20
+sampler plate,$5.80
+```
+The price values should begin with '$' and contain a floating point number with exactly 2 decimal places.
