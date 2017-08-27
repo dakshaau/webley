@@ -38,7 +38,7 @@ Option | Description
 --- | ---
 `-h` | Help
 `-d`, `--data` | Specify path to CSV file with menu data. Defaults to 'data.csv'
-`-max`, `--max-level` | Specify INTEGER value to indicate maximum level to go while searching for a combination. The more levels, the more time it will take to find a solution. Default value is 15.
+`-max`, `--max-items` | Specify INTEGER value to indicate maximum number of items in the combination. The more number of items, the more time it will take to find a solution. Default value is 15 items.
 `-v`, `--verbose` | Show debug outputs such as file format error, target price value, menu data etc.
 
 Here is a sample **_data.csv_** file:

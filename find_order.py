@@ -225,11 +225,11 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '-max',
-        '--max-level',
-        help='''Specify INTEGER value to indicate maximum level to
-        go while searching for a combination. The more levels,
+        '--max-items',
+        help='''Specify INTEGER value to indicate maximum number of items in the
+        combination. The more number of items,
         the more time it will take to find a solution.
-        Default value is 15.
+        Default value is 15 items.
         ''',
         type=int,
         default=15,
@@ -240,7 +240,7 @@ if __name__ == '__main__':
     except Exception as e:
         parser.print_help()
     verbosity = args.verbose
-    max_level = args.max_level
+    max_level = args.max_items
     data_file = None
     try:
         data_file = open(args.data, 'r')
