@@ -58,7 +58,7 @@ def match_price_pattern(price):
     return True if pattern.fullmatch(price) else False
 
 
-def parse_data_file(lines):
+def parse_data_file(lines, verbose):
     """
     This function parses the list of lines in data file containing the target
     value and menu items.
@@ -117,8 +117,9 @@ def parse_data_file(lines):
             # Ignoring empty lines
             pass
         except Exception as e:
-            print('Invalid CSV file ...')
-            print('Exiting ...')
+            if verbose:
+                print('Invalid CSV file ...')
+                print('Exiting ...')
             return 0., {}
         else:
             item = item.strip()
@@ -129,17 +130,18 @@ def parse_data_file(lines):
                 else:
                     menu_items[item] = float(price[1:] if '$' in price else price)
             else:
-                print('Invalid format price format, {}, for data file ...'.format(
-                    price
-                    ))
-                print('\nAccepted formats: $xx.xx, xx.xx, xx')
-                print('Examples: $15.00, $1.00, $0.03, $15, 1, 0.03, 15.05')
-                print('\nExiting ...')
+                if verbose:
+                    print('Invalid format price format, {}, for data file ...'.format(
+                        price
+                        ))
+                    print('\nAccepted formats: $xx.xx, xx.xx, xx')
+                    print('Examples: $15.00, $1.00, $0.03, $15, 1, 0.03, 15.05')
+                    print('\nExiting ...')
                 return 0., {}
     return target, menu_items
 
 
-def breadth_first_search(target, menu, max_level=20):
+def breadth_first_search(target, menu, max_level=15):
     """
     This function performs breadth first graph search on the menu items
     to find a combination of itmes whose price sums up to the target value.
@@ -165,24 +167,26 @@ def breadth_first_search(target, menu, max_level=20):
                 if cur_sum == target:
                     return combination
             # print(visited)
+        else:
+            break
     return Counter()
 
 
-def find_combination(target, menu):
+def find_combination(target, menu, max_level):
     """
     This function filters the menu items to only contain items that have
     price less than or equal to the target price and feed it to
     breadth_first_search.
 
-    Returns: A frozenset containing combination of menu items.
-             An empty frozenset if no combination is possible.
+    Returns: A Counter containing combination of menu items.
+             An empty Counter if no combination is possible.
     """
     filtered_menu = dict([(key, value) for key, value in menu.items() if value <= target])
-    return breadth_first_search(target, menu)
+    return breadth_first_search(target, menu, max_level=max_level)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Webley Coding Puzzle, by Daksh Gupta')
     parser.add_argument(
         '-d',
         '--data',
@@ -194,7 +198,30 @@ if __name__ == '__main__':
         required=True,
         )
 
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        help='''Show debug outputs such as file format error,
+        target price value, menu data etc.
+        ''',
+        action='store_true',
+        )
+
+    parser.add_argument(
+        '-max',
+        '--max-level',
+        help='''Specify INTEGER value to indicate maximum level to
+        go while searching for a combination. The more levels,
+        the more time it will take to find a solution.
+        Default value is 15.
+        ''',
+        type=int,
+        default=15,
+        )
+
     args = parser.parse_args()
+    verbosity = args.verbose
+    max_level = args.max_level
     data_file = None
     try:
         data_file = open(args.data, 'r')
@@ -204,17 +231,18 @@ if __name__ == '__main__':
         print('Unable to open {} ...'.format(args.target))
         print('Try with administrative priviledges.')
 
-    target, menu = parse_data_file(data_file)
+    target, menu = parse_data_file(data_file, verbosity)
     if not menu:
         sys.exit()
 
-    print('Target price: ${:.2f}'.format(target))
-    print('\nMenu:')
-    for item in menu:
-        print('${1:.2f}\t{0}'.format(item, menu[item]))
-    print()
+    if verbosity:
+        print('Target price: ${:.2f}'.format(target))
+        print('\nMenu:')
+        for item in menu:
+            print('${1:.2f}\t{0}'.format(item, menu[item]))
+        print()
 
-    combination = find_combination(target, menu)
+    combination = find_combination(target, menu, max_level)
     if len(combination) == 0:
         print('There is no combination of dishes that is equal to the target price')
     else:
