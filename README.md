@@ -38,4 +38,14 @@ hot wings,$3.55
 mozzarella sticks,$4.20
 sampler plate,$5.80
 ```
-The price values should begin with '$' and contain a floating point number with exactly 2 decimal places.
+The first line of this file should contain a target price value.
+
+Empty lines in the CSV file are also acceptable.
+
+The price may be put in the following formats:
+```
+$15.00
+15.00
+15
+```
+Any other format other than the above is not an acceptable format.
