@@ -8,6 +8,7 @@ def match_price_pattern(price):
     """
     This function makes sure that the pattern is in the following format:
         $x.xx
+        $x
         x.xx
         x
 
@@ -18,6 +19,7 @@ def match_price_pattern(price):
         15.05
         3.00
         34
+        $15
 
     >>> match_price_pattern('$.90')
     False
@@ -26,7 +28,7 @@ def match_price_pattern(price):
     >>> match_price_pattern('$12.900')
     False
     >>> match_price_pattern('$12')
-    False
+    True
     >>> match_price_pattern('$15.02')
     True
     >>> import random
@@ -35,7 +37,7 @@ def match_price_pattern(price):
     >>> match_price_pattern(price)
     True
     >>> match_price_pattern(price[:-3])
-    False
+    True
     >>> match_price_pattern('$0...012')
     False
     >>> match_price_pattern('1.22')
@@ -51,7 +53,7 @@ def match_price_pattern(price):
     >>> match_price_pattern('15.0')
     False
     """
-    pattern = re.compile('(\$[0-9]+\.[0-9]{2}|[0-9]+\.[0-9]{2}|[0-9]+)')
+    pattern = re.compile('(\$[0-9]+\.[0-9]{2}|[0-9]+\.[0-9]{2}|[0-9]+|\$[0-9]+)')
     return True if pattern.fullmatch(price) else False
 
 
@@ -67,7 +69,7 @@ def parse_data_file(lines):
     Invalid format price format, asd, for data file ...
     <BLANKLINE>
     Accepted formats: $xx.xx, xx.xx, xx
-    Examples: $15.00, $1.00, $0.03, 1, 0.03, 15.05
+    Examples: $15.00, $1.00, $0.03, $15, 1, 0.03, 15.05
     <BLANKLINE>
     Exiting ...
     >>> targ == 0.
@@ -130,7 +132,7 @@ def parse_data_file(lines):
                     price
                     ))
                 print('\nAccepted formats: $xx.xx, xx.xx, xx')
-                print('Examples: $15.00, $1.00, $0.03, 1, 0.03, 15.05')
+                print('Examples: $15.00, $1.00, $0.03, $15, 1, 0.03, 15.05')
                 print('\nExiting ...')
                 return 0., {}
     return target, menu_items

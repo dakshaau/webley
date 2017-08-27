@@ -45,6 +45,7 @@ Empty lines in the CSV file are also acceptable.
 The price may be put in the following formats:
 ```
 $15.00
+$15
 15.00
 15
 ```
