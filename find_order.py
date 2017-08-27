@@ -2,7 +2,7 @@ import argparse
 import re
 import sys
 import itertools
-from collections import Counter, deque
+from collections import Counter, deque, OrderedDict
 
 
 def match_price_pattern(price):
@@ -169,7 +169,6 @@ def breadth_first_search(target, menu, max_level=15):
                             queue.append((new_combination, cur_sum+price))
                 if cur_sum == target:
                     return combination
-            # print(visited)
         else:
             break
     return Counter()
@@ -185,8 +184,13 @@ def find_combination(target, menu, max_level):
                 OR
              An empty Counter if no combination is possible.
     """
-    filtered_menu = dict([(key, value) for key, value in menu.items() if value <= target])
-    return breadth_first_search(target, menu, max_level=max_level)
+    filtered_menu = OrderedDict()
+    for item, price in sorted(menu.items(), key=lambda x: x[1]):
+        if price > target:
+            break
+        else:
+            filtered_menu[item] = price
+    return breadth_first_search(target, filtered_menu, max_level=max_level)
 
 
 class Parser(argparse.ArgumentParser):
